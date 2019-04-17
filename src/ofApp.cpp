@@ -2,36 +2,41 @@
 
 void ofApp::setup(){
     ofToggleFullscreen();
-    layer1.setup("rocks1.jpg");
-    layer2.setup("rocks2.jpg");
-    layer3.setup("rocks3.jpg");
+    loadFiles("rocks", 3, rockLayers);
+    loadFiles("rocks-mask", 2, rockMasks, LOAD_IDENTICAL);
 
-    mask1.setup("rocks-mask1.jpg");
-    mask2.setup("rocks-mask1.jpg");
+    rockLayers[1].incrementTextureOffsetX(-0.04);
+    rockLayers[2].incrementTextureScale(0.2);
+    rockLayers[2].incrementTextureOffsetY(0.2);
+    rockLayers[2].flipTexture(TEXTURE_FLIP_HORIZONTAL);
 
-    layer2.incrementTextureOffsetX(-0.04);
-    layer3.incrementTextureScale(0.2);
-    layer3.incrementTextureOffsetY(0.2);
-    layer3.flipTexture(TEXTURE_FLIP_HORIZONTAL);
-
-    mask.setup(3);
+    masker.setup(3);
     count = 0;
 }
 
-void ofApp::update(){
-    layer1.incrementTextureOffsetY(0.002);
-    layer2.incrementTextureOffsetY(-0.004);
-    layer3.incrementTextureOffsetX(-0.001);
+void ofApp::loadFiles(string baseFilename, int count, vector<ofxTexturePlane>& collection, csLoadingMode mode){
+    string fileIndex;
+    for(int i = 1; i <= count; i++){
+        fileIndex = mode == LOAD_INCREMENTAL ? ofToString(i) : "";
+        collection.push_back(blankSlate);
+        collection.back().setup(baseFilename + fileIndex + ".jpg");
+    }
+}
 
-    mask1.incrementTextureOffsetY(0.002);
-    mask2.incrementTextureOffsetY(-0.002);
+void ofApp::update(){
+    rockLayers[0].incrementTextureOffsetY(0.002);
+    rockLayers[1].incrementTextureOffsetY(-0.004);
+    rockLayers[2].incrementTextureOffsetX(-0.001);
+
+    rockMasks[0].incrementTextureOffsetY(0.002);
+    rockMasks[1].incrementTextureOffsetY(-0.002);
 }
 
 void ofApp::draw(){
     ofBackground(ofColor::black);
 
     //Layer 1
-    mask.beginLayer(0);
+    masker.beginLayer(0);
     {
         ofSetColor(ofColor::black);
         if(count > 0) {
@@ -42,57 +47,57 @@ void ofApp::draw(){
             count = ofRandom(255);
         }
         else if(ofRandom(1) < 0.025) ofSetColor(ofColor::white);
-        layer2.draw();
+        rockLayers[1].draw();
     }
-    mask.endLayer(0);
+    masker.endLayer(0);
     
     //Layer 2
-    mask.beginLayer(1);
+    masker.beginLayer(1);
     {
         ofSetColor(255, 0, 0);
-        layer3.draw();
+        rockLayers[2].draw();
     }
-    mask.endLayer(1);
+    masker.endLayer(1);
     
-    mask.beginMask(1);
+    masker.beginMask(1);
     {
-        mask1.draw();
+        rockMasks[0].draw();
         ofEnableBlendMode(OF_BLENDMODE_ADD);
-        mask2.draw();
+        rockMasks[1].draw();
         ofDisableBlendMode();
         ofSetColor(ofColor::black);
-        ofDrawRectangle(0, 0, mask.getWidth() * 0.5, mask.getHeight());
+        ofDrawRectangle(0, 0, masker.getWidth() * 0.5, masker.getHeight());
     }
-    mask.endMask(1);
+    masker.endMask(1);
 
     //Layer 3
-    mask.beginLayer(2);
+    masker.beginLayer(2);
     {
         ofSetColor(ofColor::red);
-        layer3.flipTexture(TEXTURE_FLIP_VERTICAL);
-        layer3.draw();
-        layer3.flipTexture(TEXTURE_FLIP_VERTICAL);
+        rockLayers[2].flipTexture(TEXTURE_FLIP_VERTICAL);
+        rockLayers[2].draw();
+        rockLayers[2].flipTexture(TEXTURE_FLIP_VERTICAL);
     }
-    mask.endLayer(2);
+    masker.endLayer(2);
     
-    mask.beginMask(2);
+    masker.beginMask(2);
     {
-        mask1.draw();
+        rockMasks[0].draw();
         ofEnableBlendMode(OF_BLENDMODE_ADD);
-        mask2.draw();
+        rockMasks[1].draw();
         ofDisableBlendMode();
         ofSetColor(ofColor::black);
-        ofDrawRectangle(mask.getWidth() * 0.5, 0, mask.getWidth(), mask.getHeight());
+        ofDrawRectangle(masker.getWidth() * 0.5, 0, masker.getWidth(), masker.getHeight());
     }
-    mask.endMask(2);
+    masker.endMask(2);
 
     //Draw it
-    mask.draw();
-    mask.drawOverlay();
+    masker.draw();
+    masker.drawOverlay();
 }
 
 void ofApp::keyPressed(int key){
     if(key == ' '){
-        mask.toggleOverlay();
+        masker.toggleOverlay();
     }
 }

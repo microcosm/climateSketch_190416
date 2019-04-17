@@ -4,16 +4,23 @@
 #include "ofxTexturePlane.h"
 #include "ofxLayerMask.h"
 
+enum csLoadingMode {
+    LOAD_INCREMENTAL,
+    LOAD_IDENTICAL
+};
+
 class ofApp : public ofBaseApp{
 
 public:
     void setup();
+    void loadFiles(string baseFilename, int count, vector<ofxTexturePlane>& collection, csLoadingMode mode=LOAD_INCREMENTAL);
     void update();
     void draw();
     void keyPressed(int key);
 
-    ofxTexturePlane layer1, layer2, layer3;
-    ofxTexturePlane mask1, mask2;
-    ofxLayerMask mask;
+    ofxTexturePlane blankSlate;
+    vector<ofxTexturePlane> rockLayers;
+    vector<ofxTexturePlane> rockMasks;
+    ofxLayerMask masker;
     int count;
 };
