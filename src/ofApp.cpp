@@ -4,14 +4,22 @@ void ofApp::setup(){
     ofToggleFullscreen();
     loadFiles("rocks", 3, rockLayers);
     loadFiles("rocks-mask", 2, rockMasks, LOAD_IDENTICAL);
+    loadFiles("week4skyline", 6, skylineLayers);
+    loadFiles("week4skyline", 6, skylineMasks);
 
     rockLayers[1].incrementTextureOffsetX(-0.04);
     rockLayers[2].incrementTextureScale(0.2);
     rockLayers[2].incrementTextureOffsetY(0.2);
     rockLayers[2].flipTexture(TEXTURE_FLIP_HORIZONTAL);
 
-    masker.setup(3);
-    count = 0;
+    for(int i = 0; i < 6; i++){
+        skylineLayers[i].flipTexture(TEXTURE_FLIP_HORIZONTAL);
+        skylineMasks[i].flipTexture(TEXTURE_FLIP_HORIZONTAL);
+    }
+
+    masker.setup(4);
+    colorFlashCount = 0;
+    skylineNumber = 1;
 }
 
 void ofApp::loadFiles(string baseFilename, int count, vector<ofxTexturePlane>& collection, csLoadingMode mode){
@@ -39,12 +47,12 @@ void ofApp::draw(){
     masker.beginLayer(0);
     {
         ofSetColor(ofColor::black);
-        if(count > 0) {
-            ofSetColor(ofColor::red, count);
-            count -= 24;
+        if(colorFlashCount > 0) {
+            ofSetColor(ofColor::red, colorFlashCount);
+            colorFlashCount -= 24;
         } else if(ofRandom(1) < 0.015){
             ofSetColor(ofColor::red);
-            count = ofRandom(255);
+            colorFlashCount = ofRandom(255);
         }
         else if(ofRandom(1) < 0.025) ofSetColor(ofColor::white);
         rockLayers[1].draw();
@@ -91,6 +99,24 @@ void ofApp::draw(){
     }
     masker.endMask(2);
 
+    if(skylineNumber >= 0 && skylineNumber <= 5){
+        masker.beginLayer(3);
+        {
+            ofBackground(ofColor::black);
+            //skylineLayers[ofGetFrameNum() % 6].draw();
+            skylineLayers[skylineNumber].draw();
+        }
+        masker.endLayer(3);
+        
+        masker.beginMask(3);
+        {
+            ofBackground(ofColor::black);
+            //skylineMasks[ofGetFrameNum() % 6].draw();
+            skylineLayers[skylineNumber].draw();
+        }
+        masker.endMask(3);
+    }
+
     //Draw it
     masker.draw();
     masker.drawOverlay();
@@ -99,5 +125,8 @@ void ofApp::draw(){
 void ofApp::keyPressed(int key){
     if(key == ' '){
         masker.toggleOverlay();
+    }else{
+        cout << key - 49 << endl;
+        skylineNumber = key - 49;
     }
 }

@@ -21,6 +21,9 @@ public:
     ofxTexturePlane blankSlate;
     vector<ofxTexturePlane> rockLayers;
     vector<ofxTexturePlane> rockMasks;
+    vector<ofxTexturePlane> skylineLayers;
+    vector<ofxTexturePlane> skylineMasks;
     ofxLayerMask masker;
-    int count;
+    int colorFlashCount;
+    int skylineNumber;
 };
