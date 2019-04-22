@@ -12,14 +12,9 @@ void ofApp::setup(){
     rockLayers[2].incrementTextureOffsetY(0.2);
     rockLayers[2].flipTexture(TEXTURE_FLIP_HORIZONTAL);
 
-    for(int i = 0; i < 6; i++){
-        skylineLayers[i].flipTexture(TEXTURE_FLIP_HORIZONTAL);
-        skylineMasks[i].flipTexture(TEXTURE_FLIP_HORIZONTAL);
-    }
-
     masker.setup(4);
     colorFlashCount = 0;
-    skylineNumber = 1;
+    skylineNumber = 0;
 }
 
 void ofApp::loadFiles(string baseFilename, int count, vector<ofxTexturePlane>& collection, csLoadingMode mode){
