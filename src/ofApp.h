@@ -26,4 +26,5 @@ public:
     ofxLayerMask masker;
     int colorFlashCount;
     int skylineNumber;
+    bool manualSkyline;
 };

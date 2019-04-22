@@ -13,6 +13,8 @@ void ofApp::setup(){
     rockLayers[2].flipTexture(TEXTURE_FLIP_HORIZONTAL);
 
     masker.setup(4);
+
+    manualSkyline = true;
     colorFlashCount = 0;
     skylineNumber = 0;
 }
@@ -123,5 +125,6 @@ void ofApp::keyPressed(int key){
     }else{
         cout << key - 49 << endl;
         skylineNumber = key - 49;
+        manualSkyline = skylineNumber >= 0 && skylineNumber <= 5;
     }
 }
