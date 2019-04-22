@@ -12,9 +12,14 @@ void ofApp::setup(){
     rockLayers[2].incrementTextureOffsetY(0.2);
     rockLayers[2].flipTexture(TEXTURE_FLIP_HORIZONTAL);
 
+    for(int i = 0; i < 6; i ++){
+        skylineLayers[i].setTextureOffset(TEXTURE_OFFSET_TOP_CENTER);
+        skylineMasks[i].setTextureOffset(TEXTURE_OFFSET_TOP_CENTER);
+    }
+
     masker.setup(4);
 
-    manualSkyline = true;
+    manualSkyline = false;
     colorFlashCount = 0;
     skylineNumber = 0;
 }
@@ -35,6 +40,10 @@ void ofApp::update(){
 
     rockMasks[0].incrementTextureOffsetY(0.002);
     rockMasks[1].incrementTextureOffsetY(-0.002);
+
+    if(!manualSkyline && ofRandom(1) < 0.1){
+        skylineNumber = ofRandom(6);
+    }
 }
 
 void ofApp::draw(){
