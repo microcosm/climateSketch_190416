@@ -2,6 +2,8 @@
 
 void ofApp::setup(){
     ofToggleFullscreen();
+    ofSetBackgroundAuto(false);
+
     loadFiles("rocks", 3, rockLayers);
     loadFiles("rocks-mask", 2, rockMasks, LOAD_IDENTICAL);
     loadFiles("week4skyline", 6, skylineLayers);
@@ -12,16 +14,22 @@ void ofApp::setup(){
     rockLayers[2].incrementTextureOffsetY(0.2);
     rockLayers[2].flipTexture(TEXTURE_FLIP_HORIZONTAL);
 
+    initializeSkylines();
+    masker.setup(5);
+
+    manualSkyline = false;
+    colorFlashCount = 0;
+    skylineNumber = 0;
+}
+
+void ofApp::initializeSkylines(){
     for(int i = 0; i < 6; i ++){
         skylineLayers[i].setTextureOffset(TEXTURE_OFFSET_TOP_CENTER);
         skylineMasks[i].setTextureOffset(TEXTURE_OFFSET_TOP_CENTER);
     }
 
-    masker.setup(4);
-
-    manualSkyline = false;
-    colorFlashCount = 0;
-    skylineNumber = 0;
+    skylinePositionIncrement = 0;
+    skylineOpacity = 255;
 }
 
 void ofApp::loadFiles(string baseFilename, int count, vector<ofxTexturePlane>& collection, csLoadingMode mode){
@@ -34,21 +42,36 @@ void ofApp::loadFiles(string baseFilename, int count, vector<ofxTexturePlane>& c
 }
 
 void ofApp::update(){
+    updateBackgrounds();
+    updateSkylines();
+}
+
+void ofApp::updateBackgrounds(){
     rockLayers[0].incrementTextureOffsetY(0.002);
     rockLayers[1].incrementTextureOffsetY(-0.004);
     rockLayers[2].incrementTextureOffsetX(-0.001);
 
     rockMasks[0].incrementTextureOffsetY(0.002);
     rockMasks[1].incrementTextureOffsetY(-0.002);
+}
 
-    if(!manualSkyline && ofRandom(1) < 0.1){
+void ofApp::updateSkylines(){
+    if(!manualSkyline && ofRandom(1) < 0.05){
         skylineNumber = ofRandom(6);
+        initializeSkylines();
+
+        if(ofRandom(1) < 0.6){
+            skylinePositionIncrement = ofRandom(0.001, 0.005);
+            skylinePositionIncrement = ofRandom(1) < 0.5 ? skylinePositionIncrement : -skylinePositionIncrement;
+            skylineOpacity = ofRandom(80, 90);
+        }
     }
+
+    skylineLayers[skylineNumber].incrementTextureOffsetY(skylinePositionIncrement);
+    skylineMasks[skylineNumber].incrementTextureOffsetY(skylinePositionIncrement);
 }
 
 void ofApp::draw(){
-    ofBackground(ofColor::black);
-
     //Layer 1
     masker.beginLayer(0);
     {
@@ -108,23 +131,41 @@ void ofApp::draw(){
     if(skylineNumber >= 0 && skylineNumber <= 5){
         masker.beginLayer(3);
         {
-            ofBackground(ofColor::black);
-            //skylineLayers[ofGetFrameNum() % 6].draw();
+            ofEnableAlphaBlending();
+            ofSetColor(ofColor(ofColor::white, 70));
             skylineLayers[skylineNumber].draw();
+            ofDisableAlphaBlending();
         }
         masker.endLayer(3);
-        
+
         masker.beginMask(3);
         {
-            ofBackground(ofColor::black);
-            //skylineMasks[ofGetFrameNum() % 6].draw();
+            ofSetColor(ofColor(ofColor::white, skylineOpacity));
             skylineLayers[skylineNumber].draw();
         }
         masker.endMask(3);
+
+        masker.beginLayer(4);
+        {
+            masker.drawLayer(3);
+        }
+        masker.endLayer(4);
+
+        masker.beginMask(4);
+        {
+            ofBackground(ofColor::white);
+        }
+        masker.endMask(4);
     }
 
     //Draw it
-    masker.draw();
+    ofSetBackgroundAuto(false);
+    ofEnableAlphaBlending();
+    if(ofGetFrameNum() % 20 == 0) {
+        ofBackground(ofColor::red);
+    }
+    masker.drawLayer(3);
+    ofDisableAlphaBlending();
     masker.drawOverlay();
 }
 

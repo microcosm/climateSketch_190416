@@ -13,8 +13,11 @@ class ofApp : public ofBaseApp{
 
 public:
     void setup();
+    void initializeSkylines();
     void loadFiles(string baseFilename, int count, vector<ofxTexturePlane>& collection, csLoadingMode mode=LOAD_INCREMENTAL);
     void update();
+    void updateBackgrounds();
+    void updateSkylines();
     void draw();
     void keyPressed(int key);
 
@@ -27,4 +30,5 @@ public:
     int colorFlashCount;
     int skylineNumber;
     bool manualSkyline;
+    float skylinePositionIncrement, skylineOpacity;
 };
